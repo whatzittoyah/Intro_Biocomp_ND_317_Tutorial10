@@ -1,0 +1,38 @@
+# Problem 1
+
+#Loading the necessary packages
+library(ggplot2)
+library(deSolve)
+library(reshape2)
+library(grid Extra)
+
+#Defining a custom function
+popnSim=function(t,y,p){
+  N=y
+  R=p[1]
+  K=p[2]
+
+dNdt=R*(1-N/K)*N
+
+return(list(dNdt))
+}
+
+#assigning R-values into a dataframe for looping
+Rvalues=c(-.01,0.1,0.4,0.8,1.0)
+RList=array(data=Rvalues, dim=c(1,5))
+
+#Creating a for-loop to generate a plot
+NO=10
+K=100
+times=1:100
+
+modelpopnSimOutput=matrix(nrow= length(times), ncol=(1+length(RList)))
+modelpopnSimOutput[,1]=c(1:100)
+
+for (i in 1: length(RList[1,])){
+  modelpopnSim=ode(y=NO,times=times,func=popnSim,parms=c(RList[i],K))
+  modelpopnSimOutput[,(1+i)]=modelpopnSim[,2]
+}
+
+ggplot()+geom_line(data = modelpopnSimOutput, aes(x = var1, y = value, group = var2, color = factor(var2)))+labs(title = "Varying R Values", x = "time", y = "Population Size")
+
